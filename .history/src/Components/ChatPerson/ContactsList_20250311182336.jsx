@@ -27,13 +27,13 @@ const formatTimestamp = (timestamp) => {
   return messageDate.format("DD/MM/YYYY");
 };
 
-const ContactsList = ({ onContactSelect, currentUser }) => {
+const ContactsList = ({ onContactSelect }) => {
   const [contacts, setContacts] = useState([]);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [showContactsModal, setShowContactsModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedContactId, setSelectedContactId] = useState(null);
+  const [selectedContactId, setSelectedContactId] = useState(null); // New state for selected contact
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,15 +44,13 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
       (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const contactsArray = Object.entries(data)
-            .filter(([id]) => id !== currentUser.userId) // Exclude current user
-            .map(([id, user]) => ({
-              id,
-              name: user.fullName,
-              avatar: user.avatar || "https://via.placeholder.com/40",
-              timestamp: user.createdAt,
-              lastMessage: user.lastMessage || "No messages yet",
-            }));
+          const contactsArray = Object.entries(data).map(([id, user]) => ({
+            id,
+            name: user.fullName,
+            avatar: user.avatar || "https://via.placeholder.com/40",
+            timestamp: user.createdAt,
+            lastMessage: user.lastMessage || "No messages yet",
+          }));
           setContacts(contactsArray);
         } else {
           setContacts([]);
@@ -64,7 +62,7 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
     );
 
     return () => unsubscribe();
-  }, [currentUser.userId]);
+  }, []);
 
   const handleSearch = (query) => {
     setLocalSearchQuery(query);
@@ -75,9 +73,9 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
   );
 
   const handleContactSelect = (contact) => {
-    setSelectedContactId(contact.id);
-    onContactSelect(contact);
-    setIsOpen(false);
+    setSelectedContactId(contact.id); 
+    onContactSelect(contact); 
+    setIsOpen(false); 
   };
 
   const handleAddButtonClick = () => {
@@ -93,7 +91,7 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
   const handleLogout = () => {
     localStorage.removeItem("auth");
     setShowDropdown(false);
-    navigate("/login");
+    navigate("/login"); 
   };
 
   return (
@@ -146,9 +144,7 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
           {filteredContacts.map((contact) => (
             <div
               key={contact.id}
-              className={`contactItem ${
-                selectedContactId === contact.id ? "selected" : ""
-              }`}
+              className={`contactItem ${selectedContactId === contact.id ? "selected" : ""}`} // Add 'selected' class conditionally
               onClick={() => handleContactSelect(contact)}
             >
               <div className="contactAvatar">

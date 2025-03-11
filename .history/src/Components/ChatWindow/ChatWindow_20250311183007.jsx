@@ -52,8 +52,9 @@ const ChatWindow = ({ contact, currentUser }) => {
   const [showFileModal, setShowFileModal] = useState(false);
   const messageEndRef = useRef(null);
 
+  // Generate a unique chat ID based on user IDs
   const getChatId = (userId1, userId2) => {
-    return [userId1, userId2].sort().join("_"); // Unique chat ID
+    return [userId1, userId2].sort().join("_"); // Sort to ensure consistency
   };
 
   useEffect(() => {
@@ -107,6 +108,7 @@ const ChatWindow = ({ contact, currentUser }) => {
 
     push(messagesRef, newMessage)
       .then(() => {
+        // Update last message for both users
         const lastMessageUpdate = {
           lastMessage: message.trim(),
           timestamp: serverTimestamp(),

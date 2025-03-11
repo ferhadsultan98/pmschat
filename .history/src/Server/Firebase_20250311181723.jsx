@@ -1,6 +1,6 @@
-
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, onValue, push, serverTimestamp, update, get, remove, set } from "firebase/database";
+import { getAuth } from "firebase/auth"; // Firebase Authentication modülünü ekle
 
 const firebaseConfig = {
   apiKey: "AIzaSyDhLuMymmJPkmMQKvYX8Ma94VAG-uf1kOk",
@@ -13,5 +13,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
+const auth = getAuth(app); // Auth nesnesini oluştur
 
-export { database, ref, onValue, push, serverTimestamp, update, get, remove, set };
+export { database, ref, onValue, push, serverTimestamp, update, get, remove, set, auth }; // auth'ı export et

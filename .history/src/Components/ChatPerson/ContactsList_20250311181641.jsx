@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import "./ContactsList.scss";
 import { Search, Plus, MoreVertical, MessageCircle, LogOut } from "react-feather";
-import { database, ref, onValue } from "../../Server/Firebase";
+import { database, ref, onValue, auth } from "../../Server/Firebase"; // auth'ı buradan içe aktar
 import moment from "moment";
 import ContactsModal from "./ContactModal/ContactsModal";
 import { useNavigate } from "react-router-dom";
 
+// formatTimestamp fonksiyonu aynı kalabilir
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return "";
 
@@ -27,7 +28,7 @@ const formatTimestamp = (timestamp) => {
   return messageDate.format("DD/MM/YYYY");
 };
 
-const ContactsList = ({ onContactSelect, currentUser }) => {
+const ContactsList = ({ onContactSelect }) => {
   const [contacts, setContacts] = useState([]);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -38,25 +39,46 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
 
   useEffect(() => {
     const usersRef = ref(database, "users");
+    const chatsRef = ref(database, "chats");
+    const currentUser = auth.currentUser; // auth nesnesinden currentUser'ı al
 
     const unsubscribe = onValue(
       usersRef,
       (snapshot) => {
         const data = snapshot.val();
-        if (data) {
-          const contactsArray = Object.entries(data)
-            .filter(([id]) => id !== currentUser.userId) // Exclude current user
-            .map(([id, user]) => ({
-              id,
-              name: user.fullName,
-              avatar: user.avatar || "https://via.placeholder.com/40",
-              timestamp: user.createdAt,
-              lastMessage: user.lastMessage || "No messages yet",
-            }));
-          setContacts(contactsArray);
-        } else {
+        if (!data || !currentUser?.uid) {
           setContacts([]);
+          return;
         }
+
+        const contactsArray = Object.entries(data)
+          .filter(([id]) => id !== currentUser.uid) // Kendini listeden çıkar
+          .map(([id, user]) => ({
+            id,
+            name: user.fullName,
+            avatar: user.avatar || "https://via.placeholder.com/40",
+            timestamp: user.createdAt,
+            lastMessage: user.lastMessage || "No messages yet",
+          }));
+
+        onValue(
+          chatsRef,
+          (chatSnapshot) => {
+            const chatData = chatSnapshot.val();
+            if (chatData) {
+              contactsArray.forEach((contact) => {
+                const chatRoomId = getChatRoomId(currentUser.uid, contact.id);
+                const chat = chatData[chatRoomId];
+                if (chat) {
+                  contact.lastMessage = chat.lastMessage || "No messages yet";
+                  contact.timestamp = chat.timestamp || contact.timestamp;
+                }
+              });
+            }
+            setContacts(contactsArray);
+          },
+          { onlyOnce: false }
+        );
       },
       (error) => {
         console.error("Error fetching users:", error);
@@ -64,7 +86,11 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
     );
 
     return () => unsubscribe();
-  }, [currentUser.userId]);
+  }, []);
+
+  const getChatRoomId = (userId1, userId2) => {
+    return userId1 < userId2 ? `${userId1}_${userId2}` : `${userId2}_${userId1}`;
+  };
 
   const handleSearch = (query) => {
     setLocalSearchQuery(query);
@@ -97,6 +123,7 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
   };
 
   return (
+    // JSX kısmı aynı kalabilir
     <>
       <button
         className="contactsToggleButton"
@@ -146,9 +173,7 @@ const ContactsList = ({ onContactSelect, currentUser }) => {
           {filteredContacts.map((contact) => (
             <div
               key={contact.id}
-              className={`contactItem ${
-                selectedContactId === contact.id ? "selected" : ""
-              }`}
+              className={`contactItem ${selectedContactId === contact.id ? "selected" : ""}`}
               onClick={() => handleContactSelect(contact)}
             >
               <div className="contactAvatar">

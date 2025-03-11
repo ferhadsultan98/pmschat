@@ -10,10 +10,11 @@ import {
   update,
   onValue,
   serverTimestamp,
+  auth, // auth'ı buradan içe aktar
 } from "../../Server/Firebase";
 
 const formatTimestamp = (timestamp) => {
-  if (!timestamp) return "Sending...";
+  if (!timestamp) return "Gönderiliyor...";
 
   const now = new Date();
   const messageDate = new Date(timestamp);
@@ -35,32 +36,37 @@ const formatTimestamp = (timestamp) => {
     return "Yesterday";
   }
   if (diffInDays < 7) {
-    const dayName = messageDate.toLocaleDateString("en-US", { weekday: "long" });
+    const dayName = messageDate.toLocaleDateString("en-US", {
+      weekday: "long",
+    });
     return `${dayName} ${timeStr}`;
   }
-  return messageDate.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  return messageDate
+    .toLocaleDateString("en-US", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })
+    .replace(/\//g, "/");
 };
 
-const ChatWindow = ({ contact, currentUser }) => {
+const ChatWindow = ({ contact }) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [messages, setMessages] = useState([]);
   const [showFileModal, setShowFileModal] = useState(false);
   const messageEndRef = useRef(null);
+  const currentUser = auth.currentUser; // auth nesnesinden currentUser'ı al
 
-  const getChatId = (userId1, userId2) => {
-    return [userId1, userId2].sort().join("_"); // Unique chat ID
+  const getChatRoomId = (userId1, userId2) => {
+    return userId1 < userId2 ? `${userId1}_${userId2}` : `${userId2}_${userId1}`;
   };
 
   useEffect(() => {
-    if (!contact?.id || !currentUser?.userId) return;
+    if (!contact?.id || !currentUser?.uid) return;
 
-    const chatId = getChatId(currentUser.userId, contact.id);
-    const messagesRef = ref(database, `chats/${chatId}/messages`);
+    const chatRoomId = getChatRoomId(currentUser.uid, contact.id);
+    const messagesRef = ref(database, `chats/${chatRoomId}/messages`);
 
     const unsubscribe = onValue(
       messagesRef,
@@ -83,7 +89,7 @@ const ChatWindow = ({ contact, currentUser }) => {
     );
 
     return () => unsubscribe();
-  }, [contact?.id, currentUser?.userId]);
+  }, [contact?.id, currentUser?.uid]);
 
   const scrollToBottom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,33 +97,33 @@ const ChatWindow = ({ contact, currentUser }) => {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!message.trim() || !contact?.id || !currentUser?.userId) return;
+    if (!message.trim() || !contact?.id || !currentUser?.uid) return;
 
-    const chatId = getChatId(currentUser.userId, contact.id);
-    const messagesRef = ref(database, `chats/${chatId}/messages`);
-    const senderRef = ref(database, `users/${currentUser.userId}`);
-    const receiverRef = ref(database, `users/${contact.id}`);
+    const chatRoomId = getChatRoomId(currentUser.uid, contact.id);
+    const messagesRef = ref(database, `chats/${chatRoomId}/messages`);
+    const chatRoomRef = ref(database, `chats/${chatRoomId}`);
 
     const newMessage = {
-      senderId: currentUser.userId,
-      receiverId: contact.id,
+      senderId: currentUser.uid,
       text: message.trim(),
       timestamp: serverTimestamp(),
     };
 
     push(messagesRef, newMessage)
       .then(() => {
-        const lastMessageUpdate = {
+        update(chatRoomRef, {
           lastMessage: message.trim(),
           timestamp: serverTimestamp(),
-        };
-        update(senderRef, lastMessageUpdate);
-        update(receiverRef, lastMessageUpdate);
+          participants: {
+            [currentUser.uid]: true,
+            [contact.id]: true,
+          },
+        });
         setMessage("");
       })
       .catch((error) => {
         console.error("Error sending message:", error);
-        alert("Failed to send message.");
+        alert("Mesaj gönderilirken bir hata oluştu.");
       });
   };
 
@@ -130,13 +136,14 @@ const ChatWindow = ({ contact, currentUser }) => {
     return (
       <div className="chatWindow chatWindowNoContact">
         <div className="chatHeader">
-          <h3>Please choose a contact to start chatting...</h3>
+          <h3>Please choose the contact for write..</h3>
         </div>
       </div>
     );
   }
 
   return (
+    // JSX kısmı aynı kalabilir
     <div className="chatWindow">
       <div className="chatHeader">
         <div className="chatContactInfo">
@@ -154,12 +161,12 @@ const ChatWindow = ({ contact, currentUser }) => {
             <div
               key={msg.id}
               className={`chatMessage ${
-                msg.senderId === currentUser.userId
+                msg.senderId === currentUser.uid
                   ? "chatMessageUser"
                   : "chatMessageContact"
               }`}
             >
-              {msg.senderId !== currentUser.userId && (
+              {msg.senderId !== currentUser.uid && (
                 <img
                   src={contact.avatar}
                   alt={contact.name}
@@ -175,7 +182,7 @@ const ChatWindow = ({ contact, currentUser }) => {
             </div>
           ))
         ) : (
-          <div className="noMessages">No messages yet</div>
+          <div className="noMessages">Henüz mesaj yok</div>
         )}
         <div ref={messageEndRef} />
       </div>
