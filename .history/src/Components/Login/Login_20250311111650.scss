@@ -1,0 +1,134 @@
+.LoginContainer {
+    background: linear-gradient(to bottom, black, darkcyan, black);
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  
+    .LoginRegister {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 30vw;
+      padding: 15px 5px;
+      margin-bottom: 20px;
+  
+      .LoginSection,
+      .RegisterSection {
+        display: flex;
+        align-items: center;
+        border: 1px solid rgb(6, 63, 63);
+        padding: 10px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #ccc;
+  
+        &:hover {
+          background: rgba(6, 63, 63, 0.2);
+        }
+  
+        &.active {
+          background: rgb(6, 63, 63);
+          color: white;
+        }
+      }
+    }
+  
+    .card-container {
+      perspective: 1000px;
+      width: 30vw;
+      max-width: 40vw;
+      height: 35vh;
+    }
+  
+    .card {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.6s ease;
+      
+      &.flipped {
+        transform: rotateY(180deg);
+      }
+  
+      .card-front,
+      .card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+  
+      .card-front {
+        transform: rotateY(0deg);
+      }
+  
+      .card-back {
+        transform: rotateY(180deg);
+      }
+    }
+  
+    .LoginRegisterForm {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 1px 2px 9px rgb(10, 173, 173);
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      
+      label {
+        align-self: flex-start;
+        color: #f2f2f2;
+        margin-bottom: 5px;
+      }
+      
+      input {
+        padding: 10px;
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid rgb(6, 63, 63);
+        color: #f2f2f2;
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+        transition: border-bottom 0.3s ease;
+        
+        &:focus {
+          outline: none;
+          border-bottom: 1px solid rgb(10, 173, 173);
+        }
+        
+        &::placeholder {
+          color: #cccc;
+        }
+      }
+      
+      button {
+        padding: 10px;
+        border: 1px solid rgb(6, 63, 63);
+        background: transparent;
+        color: #ccc;
+        border-radius: 10px;
+        align-self: flex-end;
+        font-size: 1.2rem;
+        transition: all 0.5s ease;
+        cursor: pointer;
+        
+        &:hover {
+          background: rgb(3, 38, 38);
+          color: white;
+        }
+      }
+    }
+  }

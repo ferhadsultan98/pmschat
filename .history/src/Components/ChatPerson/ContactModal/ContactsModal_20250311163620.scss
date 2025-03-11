@@ -1,0 +1,116 @@
+.contactsModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    
+    .contactsModalContent {
+      width: 400px;
+      max-height: 80vh;
+      background-color: rgb(12, 60, 60);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      
+      .contactsModalHeader {
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgb(8, 139, 139);
+        
+        h2 {
+          font-size: 16px;
+          font-weight: 600;
+        }
+        
+        .contactsCloseButton {
+          background: none;
+          border: none;
+          outline: none;
+          cursor: pointer;
+          color: #8a8a8a;
+          padding: 4px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
+          &:hover {
+            color: #ffffff;
+          }
+        }
+      }
+      
+      .contactsSearchContainer {
+        padding: 12px 16px;
+        border-bottom: 1px solid rgb(8, 139, 139);
+        
+        .contactsSearchInput {
+          background: none;
+          border-radius: 20px;
+          padding: 8px 16px;
+          display: flex;
+          align-items: center;
+          border: 1px solid rgb(1, 11, 11);
+          
+          input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            width: 100%;
+            margin-left: 10px;
+            font-size: 14px;
+            
+            &::placeholder {
+              color: #8a8a8a;
+            }
+          }
+        }
+      }
+      
+      .contactsModalList {
+        overflow-y: auto;
+        max-height: 400px;
+        padding: 8px 0;
+        display: flex;
+        flex-direction: column;
+        
+        .contactsModalItem {
+          align-items: center;
+          padding: 12px 16px;
+          cursor: pointer;
+          
+          &:hover {
+            background-color: rgb(8, 139, 139);
+          }
+          
+          .contactsModalAvatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 12px;
+          }
+          
+          .contactsModalName {
+            font-size: 14px;
+            font-weight: 500;
+          }
+        }
+        
+        .contactsNoResults {
+          padding: 16px;
+          text-align: center;
+          color: #8a8a8a;
+          font-size: 14px;
+        }
+      }
+    }
+  }

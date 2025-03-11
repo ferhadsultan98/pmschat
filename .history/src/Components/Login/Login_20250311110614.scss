@@ -1,0 +1,65 @@
+.LoginContainer{
+    background: linear-gradient(to bottom, black, darkcyan, black) ;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 
+    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 
+    'Open Sans', 'Helvetica Neue', sans-serif;
+    .LoginRegister{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        
+    }
+    .LoginForm{
+       
+       width: 30vw;
+       height: 35vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+        box-shadow: 1px 2px 5px #ccc;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 10px 20px;
+        max-width: 40vw;
+        label{
+            align-self: flex-start;
+       
+        }
+        input{
+            padding: 10px;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgb(170, 170, 170);
+            color: #f2f2f2;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            &:focus{
+                outline: none;
+            }
+            &::placeholder{
+                color: #cccc;
+            }
+        }
+        button{
+            padding: 10px;
+            border: 1px solid rgb(6, 63, 63);
+            background: transparent;
+            color: #ccc;
+            border-radius: 10px;
+            align-self: flex-end;
+            font-size: 1.2rem;
+            transition: 0.5s ease;
+            cursor: pointer;
+            &:hover{
+                background: rgb(3, 38, 38);
+            }
+        }
+    }
+}
