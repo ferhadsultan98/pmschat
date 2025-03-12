@@ -30,7 +30,7 @@ const formatTimestamp = (timestamp) => {
 const ContactsList = ({ onContactSelect, currentUser }) => {
   const [contacts, setContacts] = useState([]);
   const [localSearchQuery, setLocalSearchQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [showContactsModal, setShowContactsModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedContactId, setSelectedContactId] = useState(null);
