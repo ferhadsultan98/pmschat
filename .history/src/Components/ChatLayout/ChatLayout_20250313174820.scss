@@ -1,0 +1,13 @@
+.chatLayout {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: #011514;
+    padding: 25px;
+  }
+
+  @media only screen and (max-width: 760px) {
+    .chatLayout{
+      padding: 0px;
+    }
+  }
